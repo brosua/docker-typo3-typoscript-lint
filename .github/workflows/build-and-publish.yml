@@ -1,11 +1,8 @@
 name: Publish Docker image
 
 on:
-  push:
-    branches:
-      - 'master'
-    tags:
-      - 'v*'
+  schedule:
+    - cron:  '* 0 * * *'
 
 jobs:
   push_to_registries:
@@ -17,18 +14,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2    
-      - 
-        name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          images: |
-            brosua/typo3-typoscript-lint
-          tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+        uses: actions/checkout@v2
       - 
         name: Log in to Docker Hub
         uses: docker/login-action@v1
@@ -39,7 +25,5 @@ jobs:
         name: Build and push Docker images
         uses: docker/build-push-action@v2
         with:
-          context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          push: true
+          tags: brosua/typo3-typoscript-lint:latest
